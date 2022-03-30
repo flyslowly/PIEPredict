@@ -26,7 +26,7 @@ from pie_predict import PIEPredict
 
 from pie_data import PIE
 
-from tensorflow.keras import backend as K
+import keras.backend as K
 import tensorflow as tf
 
 from prettytable import PrettyTable
