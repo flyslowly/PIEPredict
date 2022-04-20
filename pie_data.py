@@ -953,7 +953,7 @@ class PIE(object):
                 if not isdir(file_path):
                     makedirs(file_path)
                 file_path = join(file_path, filename)
-                f = open(join(file_path, 'w', newline='')
+                f = open(file_path, 'w', newline='')
                 csv_writer = csv.writer(f, delimiter=' ')
 
                 for pid in sorted(pid_annots):
