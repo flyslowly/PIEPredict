@@ -971,7 +971,7 @@ class PIE(object):
                     box_seq.append(boxes[::seq_stride])
                     center_seq.append([self._get_center(b) for b in boxes][::seq_stride])
 
-                    print('loc numbers: %d' % (len(center_seq)))
+                    print('loc numbers: %d' % (len(boxes)))
                     occ_seq.append(occlusions[::seq_stride])
 
                     ped_ids = [[pid]] * len(boxes)
