@@ -945,18 +945,13 @@ class PIE(object):
                 pid_annots = annotations[sid][vid]['ped_annotations']
                 vid_annots = annotations[sid][vid]['vehicle_annotations']
                 for pid in sorted(pid_annots):
-                    count+=1
-                    print('Pedestrian ID: ' + pid)
+                    print('sid: ' + sid + ' vid: ' + vid + ' Pedestrian ID: ' + pid)
                     if params['data_split_type'] != 'default' and pid not in _pids:
                         continue
                     num_pedestrians += 1
                     frame_ids = pid_annots[pid]['frames']
-                    print('Frames IDs:')
-                    print(frame_ids)
+                    print('Frames number: ' + len(frame_ids))
                     boxes = pid_annots[pid]['bbox']
-
-                    for b in boxes:
-                        print(self._get_center(b))
 
                     images = [self._get_image_path(sid, vid, f) for f in frame_ids]
                     occlusions = pid_annots[pid]['occlusion']
@@ -975,6 +970,8 @@ class PIE(object):
                     image_seq.append(images[::seq_stride])
                     box_seq.append(boxes[::seq_stride])
                     center_seq.append([self._get_center(b) for b in boxes][::seq_stride])
+
+                    print('loc numbers: ' + len(center_seq))
                     occ_seq.append(occlusions[::seq_stride])
 
                     ped_ids = [[pid]] * len(boxes)
@@ -990,8 +987,6 @@ class PIE(object):
                     head_ang_seq.append([[vid_annots[i]['heading_angle']] for i in frame_ids][::seq_stride])
                     yrp_seq.append([(vid_annots[i]['yaw'], vid_annots[i]['roll'], vid_annots[i]['pitch'])
                                     for i in frame_ids][::seq_stride])
-                    if count > 1000:
-                        sys.exit(0)
 
         print('Subset: %s' % image_set)
         print('Number of pedestrians: %d ' % num_pedestrians)
