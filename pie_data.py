@@ -949,8 +949,11 @@ class PIE(object):
                 vid_annots = annotations[sid][vid]['vehicle_annotations']
                 
                 filename = sid + '_' + vid + '.txt'
-                file_path = '/dataset/pie/' + image_set + '/' + filename
-                f = open(file_path, 'w', newline='')
+                file_path = '/dataset/pie/' + image_set
+                if not isdir(file_path):
+                    makedirs(file_path)
+                file_path = join(file_path, filename)
+                f = open(join(file_path, 'w', newline='')
                 writter = csv.writer(f, delimiter=' ')
 
                 for pid in sorted(pid_annots):
