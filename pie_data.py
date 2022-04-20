@@ -954,7 +954,7 @@ class PIE(object):
                     makedirs(file_path)
                 file_path = join(file_path, filename)
                 f = open(join(file_path, 'w', newline='')
-                writter = csv.writer(f, delimiter=' ')
+                csv_writer = csv.writer(f, delimiter=' ')
 
                 for pid in sorted(pid_annots):
                     print('sid: ' + sid + ' vid: ' + vid + ' Pedestrian ID: ' + pid)
@@ -1001,7 +1001,7 @@ class PIE(object):
                                     for i in frame_ids][::seq_stride])
                     for i in range(len(frame_ids)):
                         center_point = self._get_center(boxes[i])
-                        writter.writerow(['{:.1f}'.format(frame_ids[i] * 10), '{:.1f}'.format(int(pid.split('_')[2]))].append(center_point))
+                        csv_writer.writerow(['{:.1f}'.format(frame_ids[i] * 10), '{:.1f}'.format(int(pid.split('_')[2]))].append(center_point))
                 
                 f.close()
                 file_to_sort = pd.read_csv(file_path, header=None)
