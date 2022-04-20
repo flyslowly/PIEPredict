@@ -34,8 +34,11 @@ import sys
 import xml.etree.ElementTree as ET
 import numpy as np
 
+import csv
+import pandas as pd
+
 from os.path import join, abspath, isfile, isdir
-from os import makedirs, listdir
+from os import makedirs, listdir, system
 from sklearn.model_selection import train_test_split, KFold
 
 
@@ -944,6 +947,12 @@ class PIE(object):
                 img_width = annotations[sid][vid]['width']
                 pid_annots = annotations[sid][vid]['ped_annotations']
                 vid_annots = annotations[sid][vid]['vehicle_annotations']
+                
+                filename = sid + '_' + vid + '.txt'
+                file_path = '/dataset/pie/' + image_set + '/' + filename
+                f = open(file_path, 'w', newline='')
+                writter = csv.writer(f, delimiter=' ')
+
                 for pid in sorted(pid_annots):
                     print('sid: ' + sid + ' vid: ' + vid + ' Pedestrian ID: ' + pid)
                     if params['data_split_type'] != 'default' and pid not in _pids:
@@ -987,6 +996,16 @@ class PIE(object):
                     head_ang_seq.append([[vid_annots[i]['heading_angle']] for i in frame_ids][::seq_stride])
                     yrp_seq.append([(vid_annots[i]['yaw'], vid_annots[i]['roll'], vid_annots[i]['pitch'])
                                     for i in frame_ids][::seq_stride])
+                    for i in range(len(frame_ids)):
+                        center_point = self._get_center(boxes[i])
+                        writter.writerow(['{:.1f}'.format(frame_ids[i] * 10), '{:.1f}'.format(int(pid.split('_')[2]))].append(center_point))
+                
+                f.close()
+                file_to_sort = pd.read_csv(file_path, header=None)
+                file_to_sort.sort_index(axis=1)
+                file_to_sort.to_csv(file_path, index=False, header=None)
+                sys.exit(0)
+
 
         print('Subset: %s' % image_set)
         print('Number of pedestrians: %d ' % num_pedestrians)
