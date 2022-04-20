@@ -950,7 +950,7 @@ class PIE(object):
                         continue
                     num_pedestrians += 1
                     frame_ids = pid_annots[pid]['frames']
-                    print('Frames number: ' + len(frame_ids))
+                    print('Frames number: %d' % (len(frame_ids)))
                     boxes = pid_annots[pid]['bbox']
 
                     images = [self._get_image_path(sid, vid, f) for f in frame_ids]
@@ -971,7 +971,7 @@ class PIE(object):
                     box_seq.append(boxes[::seq_stride])
                     center_seq.append([self._get_center(b) for b in boxes][::seq_stride])
 
-                    print('loc numbers: ' + len(center_seq))
+                    print('loc numbers: %d' % (len(center_seq)))
                     occ_seq.append(occlusions[::seq_stride])
 
                     ped_ids = [[pid]] * len(boxes)
