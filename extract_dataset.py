@@ -105,7 +105,8 @@ def train_predict(dataset='pie',
         
         # print(t)
     
-    print_dict(type(beh_seq_train))
+    print(type(beh_seq_train))
+    # print_dict(beh_seq_train)
     # print_dict(beh_seq_val)
     # print_dict(beh_seq_test)
 
