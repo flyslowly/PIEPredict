@@ -1001,7 +1001,8 @@ class PIE(object):
                                     for i in frame_ids][::seq_stride])
                     for i in range(len(frame_ids)):
                         center_point = self._get_center(boxes[i])
-                        row = ['{:.1f}'.format(frame_ids[i] * 10), '{:.1f}'.format(int(pid.split('_')[2]))].append(center_point)
+                        row = ['{:.1f}'.format(frame_ids[i] * 10), '{:.1f}'.format(int(pid.split('_')[2]))]
+                        row = row.append(center_point)
                         print(row)
                         csv_writer.writerow(row)
                 
