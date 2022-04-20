@@ -1001,13 +1001,7 @@ class PIE(object):
                                     for i in frame_ids][::seq_stride])
                     for i in range(len(frame_ids)):
                         center_point = self._get_center(boxes[i])
-                        row = []
-                        frame_id = '{:.1f}'.format(frame_ids[i] * 10)
-                        pedestrian_id = '{:.1f}'.format(int(pid.split('_')[2]))
-                        row = [frame_ids, pedestrian_id]
-                        row = row.append(center_point)
-                        print(type(row))
-                        csv_writer.writerow(row)
+                        csv_writer.writerow(['{:.1f}'.format(frame_ids[i] * 10), '{:.1f}'.format(int(pid.split('_')[2]))].extend(center_point))
                 
                 f.close()
                 file_to_sort = pd.read_csv(file_path, header=None)
