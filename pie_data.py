@@ -949,7 +949,7 @@ class PIE(object):
                 vid_annots = annotations[sid][vid]['vehicle_annotations']
                 
                 filename = sid + '_' + vid + '.txt'
-                file_path = '/dataset/pie/' + image_set
+                file_path = 'dataset/pie/' + image_set
                 if not isdir(file_path):
                     makedirs(file_path)
                 file_path = join(file_path, filename)
