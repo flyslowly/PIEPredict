@@ -88,7 +88,7 @@ def train_predict(dataset='pie',
     if train_test < 2:
         beh_seq_val = imdb.generate_data_trajectory_sequence('val', **data_opts)
         beh_seq_train = imdb.generate_data_trajectory_sequence('train', **data_opts)
-        traj_model_path = t.train(beh_seq_train, beh_seq_val, **traj_model_opts)
+        # traj_model_path = t.train(beh_seq_train, beh_seq_val, **traj_model_opts)
         # speed_model_path = t.train(beh_seq_train, beh_seq_val, **speed_model_opts)
 
     if train_test > 0:
