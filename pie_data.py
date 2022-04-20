@@ -948,6 +948,9 @@ class PIE(object):
                 pid_annots = annotations[sid][vid]['ped_annotations']
                 vid_annots = annotations[sid][vid]['vehicle_annotations']
                 
+                print('#############################')
+                print('Extracting data from %s %s as %s purpose' % (sid, vid , image_set))
+
                 filename = sid + '_' + vid + '.txt'
                 file_path = 'dataset/pie/' + image_set
                 if not isdir(file_path):
@@ -957,12 +960,10 @@ class PIE(object):
                 csv_writer = csv.writer(f, delimiter=' ')
 
                 for pid in sorted(pid_annots):
-                    print('sid: ' + sid + ' vid: ' + vid + ' Pedestrian ID: ' + pid)
                     if params['data_split_type'] != 'default' and pid not in _pids:
                         continue
                     num_pedestrians += 1
                     frame_ids = pid_annots[pid]['frames']
-                    print('Frames number: %d' % (len(frame_ids)))
                     boxes = pid_annots[pid]['bbox']
 
                     images = [self._get_image_path(sid, vid, f) for f in frame_ids]
@@ -983,7 +984,6 @@ class PIE(object):
                     box_seq.append(boxes[::seq_stride])
                     center_seq.append([self._get_center(b) for b in boxes][::seq_stride])
 
-                    print('loc numbers: %d' % (len(boxes)))
                     occ_seq.append(occlusions[::seq_stride])
 
                     ped_ids = [[pid]] * len(boxes)
@@ -1009,7 +1009,6 @@ class PIE(object):
                 file_to_sort = pd.read_csv(file_path, header=None)
                 file_to_sort.sort_index(axis=1)
                 file_to_sort.to_csv(file_path, index=False, header=None)
-                sys.exit(0)
 
 
         print('Subset: %s' % image_set)
