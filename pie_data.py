@@ -957,7 +957,7 @@ class PIE(object):
                     makedirs(file_path)
                 file_path = join(file_path, filename)
                 f = open(file_path, 'w', newline='')
-                csv_writer = csv.writer(f, delimiter=' ')
+                csv_writer = csv.writer(f, delimiter='\t')
 
                 for pid in sorted(pid_annots):
                     if params['data_split_type'] != 'default' and pid not in _pids:
@@ -1001,14 +1001,11 @@ class PIE(object):
                                     for i in frame_ids][::seq_stride])
                     for i in range(len(frame_ids)):
                         center_point = self._get_center(boxes[i])
-                        row = ['{:.1f}'.format(frame_ids[i] * 10), '{:.1f}'.format(int(pid.split('_')[2]))]
+                        row = ['{:.1f}'.format(frame_ids[i]), '{:.1f}'.format(int(pid.split('_')[2]))]
                         row.extend(center_point)
                         csv_writer.writerow(row)
                 
                 f.close()
-                file_to_sort = pd.read_csv(file_path, header=None)
-                file_to_sort.sort_index(axis=1)
-                file_to_sort.to_csv(file_path, index=False, header=None)
 
 
         print('Subset: %s' % image_set)
