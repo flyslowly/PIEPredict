@@ -34,11 +34,8 @@ import sys
 import xml.etree.ElementTree as ET
 import numpy as np
 
-import csv
-import pandas as pd
-
 from os.path import join, abspath, isfile, isdir
-from os import makedirs, listdir, system
+from os import makedirs, listdir
 from sklearn.model_selection import train_test_split, KFold
 
 
@@ -871,7 +868,7 @@ class PIE(object):
         """
         return [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2]
 
-    def  generate_data_trajectory_sequence(self, image_set, **opts):
+    def generate_data_trajectory_sequence(self, image_set, **opts):
         """
         Generates pedestrian tracks
         :param image_set: the split set to produce for. Options are train, test, val.
@@ -940,32 +937,17 @@ class PIE(object):
 
         set_ids, _pids = self._get_data_ids(image_set, params)
 
-        count = 0
-
         for sid in set_ids:
             for vid in sorted(annotations[sid]):
                 img_width = annotations[sid][vid]['width']
                 pid_annots = annotations[sid][vid]['ped_annotations']
                 vid_annots = annotations[sid][vid]['vehicle_annotations']
-                
-                print('#############################')
-                print('Extracting data from %s %s as %s purpose' % (sid, vid , image_set))
-
-                filename = sid + '_' + vid + '.txt'
-                file_path = 'dataset/pie/' + image_set
-                if not isdir(file_path):
-                    makedirs(file_path)
-                file_path = join(file_path, filename)
-                f = open(file_path, 'w', newline='')
-                csv_writer = csv.writer(f, delimiter='\t')
-
                 for pid in sorted(pid_annots):
                     if params['data_split_type'] != 'default' and pid not in _pids:
                         continue
                     num_pedestrians += 1
                     frame_ids = pid_annots[pid]['frames']
                     boxes = pid_annots[pid]['bbox']
-
                     images = [self._get_image_path(sid, vid, f) for f in frame_ids]
                     occlusions = pid_annots[pid]['occlusion']
 
@@ -983,7 +965,6 @@ class PIE(object):
                     image_seq.append(images[::seq_stride])
                     box_seq.append(boxes[::seq_stride])
                     center_seq.append([self._get_center(b) for b in boxes][::seq_stride])
-
                     occ_seq.append(occlusions[::seq_stride])
 
                     ped_ids = [[pid]] * len(boxes)
@@ -999,14 +980,6 @@ class PIE(object):
                     head_ang_seq.append([[vid_annots[i]['heading_angle']] for i in frame_ids][::seq_stride])
                     yrp_seq.append([(vid_annots[i]['yaw'], vid_annots[i]['roll'], vid_annots[i]['pitch'])
                                     for i in frame_ids][::seq_stride])
-                    for i in range(len(frame_ids)):
-                        center_point = self._get_center(boxes[i])
-                        row = ['{:.1f}'.format(frame_ids[i]), '{:.1f}'.format(int(pid.split('_')[2]))]
-                        row.extend(center_point)
-                        csv_writer.writerow(row)
-                
-                f.close()
-
 
         print('Subset: %s' % image_set)
         print('Number of pedestrians: %d ' % num_pedestrians)
