@@ -21,10 +21,13 @@ import os
 import time
 import pickle
 import numpy as np
+import tensorflow as tf
 
 from keras.layers import Input, RepeatVector, Dense, Permute
 from keras.layers import Concatenate, Multiply, Dropout
 from keras.layers.recurrent import LSTM
+from tensorflow import keras
+from tensorflow.keras import layers
 from keras.models import Model, load_model
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
 from keras.optimizers import RMSprop
@@ -635,41 +638,60 @@ class PIEPredict(object):
         :return: An instance of the network model
         """
 
-        # Generate input data. the shapes is (sequence_lenght,length of flattened features)
+        key_dim = 512
+        ff_dim = 2048
+        num_heads = 8
+
+        # Generate input data. the shapes is (sequence_length,length of flattened features)
         _encoder_input = Input(shape=(self._observe_length, self._encoder_feature_size),
                                name='encoder_input')
 
+        x = PositionalEmbedding(self._observe_length, self._prediction_size, key_dim)(_encoder_input)
+
         # Temporal attention module
-        _attention_net = self.attention_temporal(_encoder_input, self._observe_length)
+        # _attention_net = self.attention_temporal(_encoder_input, self._observe_length) //Attention
 
         # Generate Encoder LSTM Unit
-        encoder_model = self.create_lstm_model(name='encoder_network')
-        _encoder_outputs_states = encoder_model(_attention_net)
-        _encoder_states = _encoder_outputs_states[1:]
+        # encoder_model = self.create_lstm_model(name='encoder_network') //TF
+        # _encoder_outputs_states = encoder_model(_attention_net)
+        # _encoder_states = _encoder_outputs_states[1:]
+
+        tf_encoder = TransformerEncoder(key_dim, ff_dim, num_heads)
+        encoder_outputs = tf_encoder(x)
 
         # Generate Decoder LSTM unit
-        decoder_model = self.create_lstm_model(name='decoder_network', r_state=False)
-        _hidden_input = RepeatVector(self._predict_length)(_encoder_states[0])
+        # decoder_model = self.create_lstm_model(name='decoder_network', r_state=False)
+        # _hidden_input = RepeatVector(self._predict_length)(_encoder_states[0])
         _decoder_input = Input(shape=(self._predict_length, self._decoder_feature_size),
                                name='pred_decoder_input')
 
-        # Embedding unit on the output of Encoder
-        _embedded_hidden_input = Dense(self._embed_size, activation='relu')(_hidden_input)
-        _embedded_hidden_input = Dropout(self._embed_dropout,
-                                         name='dropout_dec_input')(_embedded_hidden_input)
+        x = PositionalEmbedding(self._observe_length, self._prediction_size, key_dim)(_decoder_input)
 
-        decoder_concat_inputs = Concatenate(axis=2)([_embedded_hidden_input, _decoder_input])
+        tf_decoder = TransformerDecoder(key_dim, ff_dim, num_heads)
+
+
+        # Embedding unit on the output of Encoder
+        # _embedded_hidden_input = Dense(self._embed_size, activation='relu')(_hidden_input)
+        # _embedded_hidden_input = Dropout(self._embed_dropout,
+        #                                  name='dropout_dec_input')(_embedded_hidden_input)
+
+        # decoder_concat_inputs = Concatenate(axis=2)([_embedded_hidden_input, _decoder_input])
 
         # Self attention unit
-        att_input_dim = self._embed_size + self._decoder_feature_size
-        decoder_concat_inputs = self.attention_element(decoder_concat_inputs, att_input_dim)
+        # att_input_dim = self._embed_size + self._decoder_feature_size
+        # decoder_concat_inputs = self.attention_element(decoder_concat_inputs, att_input_dim)
 
         # Initialize the decoder with encoder states
-        decoder_output = decoder_model(decoder_concat_inputs,
-                                       initial_state=_encoder_states)
+        # decoder_output = decoder_model(decoder_concat_inputs,
+        #                                initial_state=_encoder_states)
+                                       
+        decoder_output = tf_decoder(x, encoder_outputs)                               
+        # decoder_output = Dense(self._prediction_size,
+        #                        activation='linear',
+        #                        name='decoder_dense')(decoder_output)
         decoder_output = Dense(self._prediction_size,
-                               activation='linear',
-                               name='decoder_dense')(decoder_output)
+                               activation='softmax',
+                               name='decoder_dense')(decoder_output)                       
 
         net_model = Model(inputs=[_encoder_input, _decoder_input],
                           outputs=decoder_output)
@@ -721,3 +743,80 @@ class PIEPredict(object):
         input_data_probs = Dense(input_dim, activation='sigmoid')(input_data)  # sigmoid
         output_attention_mul = Multiply()([input_data, input_data_probs])  # name='att_mul'
         return output_attention_mul
+
+class TransformerEncoder(layers.Layer):
+    def __init__(self, key_dim, ff_dim, num_heads, **kwargs):
+        super(TransformerEncoder, self).__init__(**kwargs)
+        self.key_dim = key_dim
+        self.ff_dim = ff_dim
+        self.num_heads = num_heads
+        self.attention = layers.MultiHeadAttention(
+            num_heads=num_heads, key_dim=key_dim
+        )
+        self.dense_proj = keras.Sequential(
+            [layers.Dense(ff_dim, activation="relu"), layers.Dense(key_dim),]
+        )
+        self.layernorm_1 = layers.LayerNormalization()
+        self.layernorm_2 = layers.LayerNormalization()
+    def call(self, inputs):
+        attention_output = self.attention(
+            query=inputs, value=inputs, key=inputs
+        )
+        proj_input = self.layernorm_1(inputs + attention_output)
+        proj_output = self.dense_proj(proj_input)
+        return self.layernorm_2(proj_input + proj_output)
+
+class TransformerDecoder(layers.Layer):
+    def __init__(self, key_dim, ff_dim, num_heads, **kwargs):
+        super(TransformerDecoder, self).__init__(**kwargs)
+        self.key_dim = key_dim
+        self.ff_dim = ff_dim
+        self.num_heads = num_heads
+        self.attention_1 = layers.MultiHeadAttention(
+            num_heads=num_heads, key_dim=key_dim
+        )
+        self.attention_2 = layers.MultiHeadAttention(
+            num_heads=num_heads, key_dim=key_dim
+        )
+        self.dense_proj = keras.Sequential(
+            [layers.Dense(ff_dim, activation="relu"), layers.Dense(key_dim),]
+        )
+        self.layernorm_1 = layers.LayerNormalization()
+        self.layernorm_2 = layers.LayerNormalization()
+        self.layernorm_3 = layers.LayerNormalization()
+
+    def call(self, inputs, encoder_outputs):
+        attention_output_1 = self.attention_1(
+            query=inputs, value=inputs, key=inputs
+        )
+        out_1 = self.layernorm_1(inputs + attention_output_1)
+
+        attention_output_2 = self.attention_2(
+            query=out_1,
+            value=encoder_outputs,
+            key=encoder_outputs
+        )
+        out_2 = self.layernorm_2(out_1 + attention_output_2)
+
+        proj_output = self.dense_proj(out_2)
+        return self.layernorm_3(out_2 + proj_output)
+
+class PositionalEmbedding(layers.Layer):
+    def __init__(self, sequence_length, prediction_size, key_dim, **kwargs):
+        super(PositionalEmbedding, self).__init__(**kwargs)
+        self.token_embeddings = layers.Embedding(
+            input_dim=prediction_size, output_dim=key_dim
+        )
+        self.position_embeddings = layers.Embedding(
+            input_dim=sequence_length, output_dim=key_dim
+        )
+        self.sequence_length = sequence_length
+        self.prediction_size = prediction_size
+        self.key_dim = key_dim
+
+    def call(self, inputs):
+        length = tf.shape(inputs)[-1]
+        positions = tf.range(start=0, limit=length, delta=1)
+        embedded_tokens = self.token_embeddings(inputs)
+        embedded_positions = self.position_embeddings(positions)
+        return embedded_tokens + embedded_positions
