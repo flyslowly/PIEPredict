@@ -133,23 +133,23 @@ def train_intent(train_test=1):
 
     pretrained_model_path = 'data/pie/intention/context_loc_pretrained'
 
-    if train_test < 2:  # Train
-        beh_seq_val = imdb.generate_data_trajectory_sequence('val', **data_opts)
-        beh_seq_val = imdb.balance_samples_count(beh_seq_val, label_type='intention_binary')
+    # if train_test < 2:  # Train
+    #     beh_seq_val = imdb.generate_data_trajectory_sequence('val', **data_opts)
+    #     beh_seq_val = imdb.balance_samples_count(beh_seq_val, label_type='intention_binary')
 
-        beh_seq_train = imdb.generate_data_trajectory_sequence('train', **data_opts)
-        beh_seq_train = imdb.balance_samples_count(beh_seq_train, label_type='intention_binary')
+    #     beh_seq_train = imdb.generate_data_trajectory_sequence('train', **data_opts)
+    #     beh_seq_train = imdb.balance_samples_count(beh_seq_train, label_type='intention_binary')
 
-        saved_files_path = t.train(data_train=beh_seq_train,
-                                   data_val=beh_seq_val,
-                                   epochs=400,
-                                   loss=['binary_crossentropy'],
-                                   metrics=['accuracy'],
-                                   batch_size=128,
-                                   optimizer_type='rmsprop',
-                                   data_opts=data_opts)
+    #     saved_files_path = t.train(data_train=beh_seq_train,
+    #                                data_val=beh_seq_val,
+    #                                epochs=400,
+    #                                loss=['binary_crossentropy'],
+    #                                metrics=['accuracy'],
+    #                                batch_size=128,
+    #                                optimizer_type='rmsprop',
+    #                                data_opts=data_opts)
 
-        print(data_opts['seq_overlap_rate'])
+    #     print(data_opts['seq_overlap_rate'])
 
     if train_test > 0:  # Test
         if saved_files_path == '':
