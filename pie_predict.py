@@ -23,15 +23,15 @@ import pickle
 import numpy as np
 import tensorflow as tf
 
-from keras.layers import Input, RepeatVector, Dense, Permute
-from keras.layers import Concatenate, Multiply, Dropout
-from keras.layers.recurrent import LSTM
+from tensorflow.keras.layers import Input, RepeatVector, Dense, Permute
+from tensorflow.keras.layers import Concatenate, Multiply, Dropout
+from tensorflow.keras.layers.recurrent import LSTM
 from tensorflow import keras
 from tensorflow.keras import layers
-from keras.models import Model, load_model
-from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
-from keras.optimizers import RMSprop
-from keras import regularizers
+from tensorflow.keras.models import Model, load_model
+from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
+from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras import regularizers
 
 class PIEPredict(object):
     """
