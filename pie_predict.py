@@ -651,12 +651,13 @@ class PIEPredict(object):
         key_dim = 512
         ff_dim = 2048
         num_heads = 8
+        max_len = 5000
 
         # Generate input data. the shapes is (sequence_length,length of flattened features)
         _encoder_input = Input(shape=(self._observe_length, self._encoder_feature_size),
                                name='encoder_input')
 
-        x = PositionalEmbedding(self._observe_length, self._prediction_size, key_dim)(_encoder_input)
+        x = PositionalEmbedding(self._predict_length, max_len, key_dim)(_encoder_input)
 
         # Temporal attention module
         # _attention_net = self.attention_temporal(_encoder_input, self._observe_length) //Attention
@@ -675,7 +676,7 @@ class PIEPredict(object):
         _decoder_input = Input(shape=(self._predict_length, self._decoder_feature_size),
                                name='pred_decoder_input')
 
-        x = PositionalEmbedding(self._observe_length, self._prediction_size, key_dim)(_decoder_input)
+        x = PositionalEmbedding(self._predict_length, max_len, key_dim)(_decoder_input)
 
         tf_decoder = TransformerDecoder(key_dim, ff_dim, num_heads)
 
@@ -812,16 +813,16 @@ class TransformerDecoder(layers.Layer):
         return self.layernorm_3(out_2 + proj_output)
 
 class PositionalEmbedding(layers.Layer):
-    def __init__(self, sequence_length, prediction_size, key_dim, **kwargs):
+    def __init__(self, sequence_length, max_len, key_dim, **kwargs):
         super(PositionalEmbedding, self).__init__(**kwargs)
         self.token_embeddings = layers.Embedding(
-            input_dim=prediction_size, output_dim=key_dim
+            input_dim=max_len, output_dim=key_dim
         )
         self.position_embeddings = layers.Embedding(
             input_dim=sequence_length, output_dim=key_dim
         )
         self.sequence_length = sequence_length
-        self.prediction_size = prediction_size
+        self.max_len = max_len
         self.key_dim = key_dim
 
     def call(self, inputs):
