@@ -376,9 +376,9 @@ class PIEPredict(object):
         print("Try print data input and output:")
         print("###################")
         print("xxxxxxxxxxxxxxxxxxxxxxxxxx")
-        print(tf.size(train_data[0]))
+        print(tf.compat.v1.size(train_data[0]))
         print("yyyyyyyyyyyyyyyyyyyyyy")
-        print(tf.size(train_data[1]))
+        print(tf.compat.v1.size(train_data[1]))
 
 
         #  Setting up learning schedulers
