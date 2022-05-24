@@ -376,9 +376,9 @@ class PIEPredict(object):
         print("Try print data input and output:")
         print("###################")
         print("xxxxxxxxxxxxxxxxxxxxxxxxxx")
-        print(train_data[0].shape)
+        print(train_data[0])
         print("yyyyyyyyyyyyyyyyyyyyyy")
-        print(train_data[1].shape)
+        print(train_data[1])
 
 
         #  Setting up learning schedulers
