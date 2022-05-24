@@ -169,8 +169,10 @@ def train_intent(train_test=1):
 
 def main(dataset='pie', train_test=2):
 
-      intent_model_path = train_intent(train_test=train_test)
-      train_predict(dataset=dataset, train_test=train_test, intent_model_path=intent_model_path)
+    #   intent_model_path = train_intent(train_test=train_test)
+    # train_predict(dataset=dataset, train_test=train_test, intent_model_path=intent_model_path)
+    train_predict(dataset=dataset, train_test=train_test)
+
 
 
 if __name__ == '__main__':
