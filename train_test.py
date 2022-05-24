@@ -26,12 +26,12 @@ from pie_predict import PIEPredict
 
 from pie_data import PIE
 
-import keras.backend as K
+import tensorflow.keras.backend as K
 import tensorflow as tf
 
 from prettytable import PrettyTable
 
-dim_ordering = K.image_dim_ordering()
+dim_ordering = K.image_data_format()
 
 
 def train_predict(dataset='pie',
@@ -164,7 +164,7 @@ def train_intent(train_test=1):
         print(t)
 
         K.clear_session()
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
         return saved_files_path
 
 def main(dataset='pie', train_test=2):
