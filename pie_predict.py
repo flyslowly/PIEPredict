@@ -376,7 +376,7 @@ class PIEPredict(object):
         print("Try print data input and output:")
         print("###################")
         print("xxxxxxxxxxxxxxxxxxxxxxxxxx")
-        print(tf.compat.v1.shape(train_data[0]))
+        print(np.shape(train_data[0]))
         print("yyyyyyyyyyyyyyyyyyyyyy")
         print(tf.compat.v1.size(train_data[1]))
 
