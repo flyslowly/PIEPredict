@@ -23,24 +23,24 @@ import os
 import pickle
 import time
 
-from tensorflow.keras import backend as K
-from tensorflow.keras import regularizers
-from tensorflow.keras.applications import vgg16
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.callbacks import ReduceLROnPlateau
-from tensorflow.keras.layers import Concatenate
-from tensorflow.keras.layers import ConvLSTM2D
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Input
-from tensorflow.keras.layers import RepeatVector
-from tensorflow.keras.layers.recurrent import LSTM
-from tensorflow.keras.models import Model
-from tensorflow.keras.models import load_model
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.preprocessing.image import load_img
+from keras import backend as K
+from keras import regularizers
+from keras.applications import vgg16
+from keras.callbacks import EarlyStopping
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ReduceLROnPlateau
+from keras.layers import Concatenate
+from keras.layers import ConvLSTM2D
+from keras.layers import Dense
+from keras.layers import Flatten
+from keras.layers import Input
+from keras.layers import RepeatVector
+from keras.layers import LSTM
+from keras.models import Model
+from keras.models import load_model
+from keras.optimizers import RMSprop
+from keras.preprocessing.image import img_to_array
+from keras.preprocessing.image import load_img
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 
