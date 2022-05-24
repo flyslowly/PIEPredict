@@ -25,7 +25,7 @@ import tensorflow as tf
 
 from tensorflow.keras.layers import Input, RepeatVector, Dense, Permute
 from tensorflow.keras.layers import Concatenate, Multiply, Dropout
-from keras.layers.recurrent import LSTM
+# from keras.layers.recurrent import LSTM
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Model, load_model
