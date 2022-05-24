@@ -50,7 +50,7 @@ from utils import *
 #from utilities.jaad_utilities import *
 #from utilities.train_utilities import *
 
-K.set_image_dim_ordering('tf')
+K.set_image_data_format('channels_last')
 
 
 class PIEIntent(object):
