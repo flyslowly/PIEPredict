@@ -372,6 +372,15 @@ class PIEPredict(object):
                                      monitor='val_loss')
         call_backs = [checkpoint]
 
+        print("###################")
+        print("Try print data input and output:")
+        print("###################")
+        print("xxxxxxxxxxxxxxxxxxxxxxxxxx")
+        print(tf.shape(train_data[0]))
+        print("yyyyyyyyyyyyyyyyyyyyyy")
+        print(tf.shape(train_data[1]))
+
+
         #  Setting up learning schedulers
         if learning_scheduler:
             early_stop = EarlyStopping(monitor='val_loss',
