@@ -676,7 +676,7 @@ class PIEPredict(object):
         _decoder_input = Input(shape=(self._predict_length, self._decoder_feature_size),
                                name='pred_decoder_input')
 
-        x = PositionalEmbedding(self._predict_length, max_len, key_dim)(_decoder_input)
+        # x = PositionalEmbedding(self._predict_length, max_len, key_dim)(_decoder_input)
 
         tf_decoder = TransformerDecoder(key_dim, ff_dim, num_heads)
 
@@ -696,7 +696,7 @@ class PIEPredict(object):
         # decoder_output = decoder_model(decoder_concat_inputs,
         #                                initial_state=_encoder_states)
                                        
-        decoder_output = tf_decoder(x, encoder_outputs)                               
+        decoder_output = tf_decoder(_decoder_input, encoder_outputs)                               
         # decoder_output = Dense(self._prediction_size,
         #                        activation='linear',
         #                        name='decoder_dense')(decoder_output)
