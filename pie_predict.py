@@ -694,9 +694,9 @@ class PIEPredict(object):
                                activation='softmax',
                                name='decoder_dense')(decoder_output)   
         
-        decoder_output = Reshape((45, 8))
+        # decoder_output = Reshape((45, 8))
 
-        decoder_output = Dense(self._prediction_size,
+        decoder_output = Dense(2,
                         activation='linear',
                         name='decoder_dense_flatten')(decoder_output)                
 
