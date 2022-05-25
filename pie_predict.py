@@ -372,19 +372,6 @@ class PIEPredict(object):
                                      monitor='val_loss')
         call_backs = [checkpoint]
 
-        print("###################")
-        print("Try print data input and output:")
-        print("###################")
-        print("xxxxxxxxxxxxxxxxxxxxxxxxxx")
-        print(train_data[0][0][0])
-        print(train_data[0][1][0])
-        print(np.shape(train_data[0][0]))
-        print(np.shape(train_data[0][1]))
-        print("yyyyyyyyyyyyyyyyyyyyyy")
-        print(np.shape(train_data[1]))
-        print(train_data[1][0])
-
-
         #  Setting up learning schedulers
         if learning_scheduler:
             early_stop = EarlyStopping(monitor='val_loss',
@@ -395,7 +382,7 @@ class PIEPredict(object):
                                             min_lr=1e-07, verbose=1)
             call_backs.extend([early_stop, plateau_sch])
 
-        history = pie_model.fit(x=train_data[0][0], y=train_data[1],
+        history = pie_model.fit(x=train_data[0], y=train_data[1],
                                 batch_size=batch_size, epochs=epochs,
                                 validation_data=val_data, verbose=1,
                                 callbacks=call_backs)
@@ -676,10 +663,10 @@ class PIEPredict(object):
         # Generate Decoder LSTM unit
         # decoder_model = self.create_lstm_model(name='decoder_network', r_state=False)
         # _hidden_input = RepeatVector(self._predict_length)(_encoder_states[0])
-        _decoder_input = Input(shape=(self._predict_length, self._encoder_feature_size),
+        _decoder_input = Input(shape=(self._predict_length, self._decoder_feature_size),
                                name='pred_decoder_input')
 
-        x = PositionalEmbedding(self._observe_length, max_len, key_dim)(encoder_outputs)
+        x = PositionalEmbedding(self._predict_length, max_len, key_dim)(_decoder_input)
 
         # x = PositionalEmbedding(self._predict_length, max_len, key_dim)(_decoder_input)
 
@@ -701,7 +688,7 @@ class PIEPredict(object):
         # decoder_output = decoder_model(decoder_concat_inputs,
         #                                initial_state=_encoder_states)
                                        
-        decoder_output = tf_decoder(x)                               
+        decoder_output = tf_decoder(x, encoder_outputs)                               
         # decoder_output = Dense(self._prediction_size,
         #                        activation='linear',
         #                        name='decoder_dense')(decoder_output)
@@ -709,7 +696,7 @@ class PIEPredict(object):
                                activation='softmax',
                                name='decoder_dense')(decoder_output)                       
 
-        net_model = Model(inputs=_encoder_input,
+        net_model = Model(inputs=[_encoder_input, _decoder_input],
                           outputs=decoder_output)
         net_model.summary()
 
@@ -801,11 +788,11 @@ class TransformerDecoder(layers.Layer):
         self.layernorm_2 = layers.LayerNormalization()
         self.layernorm_3 = layers.LayerNormalization()
 
-    def call(self,encoder_outputs):
+    def call(self,decoder_inputs, encoder_outputs):
         attention_output_1 = self.attention_1(
-            query=encoder_outputs, value=encoder_outputs, key=encoder_outputs
+            query=decoder_inputs, value=decoder_inputs, key=decoder_inputs
         )
-        out_1 = self.layernorm_1(encoder_outputs + attention_output_1)
+        out_1 = self.layernorm_1(decoder_inputs + attention_output_1)
 
         attention_output_2 = self.attention_2(
             query=out_1,
