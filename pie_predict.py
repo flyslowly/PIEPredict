@@ -810,7 +810,7 @@ class TransformerDecoder(layers.Layer):
         # out_2 = self.layernorm_2(out_1 + attention_output_2)
 
         proj_output = self.dense_proj(out_1)
-        return self.layernorm_3(out_out_12 + proj_output)
+        return self.layernorm_3(out_1 + proj_output)
 
 class PositionalEmbedding(layers.Layer):
     def __init__(self, sequence_length, max_len, key_dim, **kwargs):
