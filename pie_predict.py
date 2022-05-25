@@ -694,7 +694,8 @@ class PIEPredict(object):
                                activation='softmax',
                                name='decoder_dense')(decoder_output)   
 
-        tf.reshape(decoder_output, [None, 45, 8])    
+        tf.shape(decoder_output)    
+        tf.reshape(decoder_output, [None, 45, 8])  
 
         decoder_output = Dense(self._prediction_size,
                         activation='linear',
