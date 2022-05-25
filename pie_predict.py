@@ -647,7 +647,7 @@ class PIEPredict(object):
         _encoder_input = Input(shape=(self._observe_length, self._encoder_feature_size),
                                name='encoder_input')
 
-        x = PositionalEmbedding(self._observe_length, 5, key_dim)(_encoder_input)
+        x = PositionalEmbedding(self._observe_length, 4, key_dim)(_encoder_input)
 
         # Temporal attention module
         # _attention_net = self.attention_temporal(_encoder_input, self._observe_length) //Attention
@@ -666,7 +666,7 @@ class PIEPredict(object):
         _decoder_input = Input(shape=(self._predict_length, self._decoder_feature_size),
                                name='pred_decoder_input')
 
-        x = PositionalEmbedding(self._predict_length, 3, key_dim)(_decoder_input)
+        x = PositionalEmbedding(self._predict_length, 2, key_dim)(_decoder_input)
 
         # x = PositionalEmbedding(self._predict_length, max_len, key_dim)(_decoder_input)
 
