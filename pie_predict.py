@@ -641,7 +641,7 @@ class PIEPredict(object):
         key_dim = 512
         ff_dim = 2048
         num_heads = 8
-        max_len = 5000
+        max_len = 64
 
         # Generate input data. the shapes is (sequence_length,length of flattened features)
         _encoder_input = Input(shape=(self._observe_length, self._encoder_feature_size),
