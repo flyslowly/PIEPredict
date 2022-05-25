@@ -23,7 +23,7 @@ import pickle
 import numpy as np
 import tensorflow as tf
 
-from tensorflow.keras.layers import Input, RepeatVector, Dense, Permute
+from tensorflow.keras.layers import Input, RepeatVector, Dense, Permute , Reshape
 from tensorflow.keras.layers import Concatenate, Multiply, Dropout
 # from keras.layers.recurrent import LSTM
 from tensorflow import keras
@@ -693,9 +693,8 @@ class PIEPredict(object):
         decoder_output = Dense(self._prediction_size,
                                activation='softmax',
                                name='decoder_dense')(decoder_output)   
-
-        tf.shape(decoder_output)    
-        tf.reshape(decoder_output, [None, 45, 8])  
+        
+        decoder_output = Reshape((45, 8))
 
         decoder_output = Dense(self._prediction_size,
                         activation='linear',
