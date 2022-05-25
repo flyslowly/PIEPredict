@@ -689,12 +689,16 @@ class PIEPredict(object):
         #                                initial_state=_encoder_states)
                                        
         decoder_output = tf_decoder(x, encoder_outputs)                               
-        # decoder_output = Dense(self._prediction_size,
-        #                        activation='linear',
-        #                        name='decoder_dense')(decoder_output)
+
         decoder_output = Dense(self._prediction_size,
                                activation='softmax',
-                               name='decoder_dense')(decoder_output)                       
+                               name='decoder_dense')(decoder_output)   
+
+        tf.reshape(decoder_output, [None, 45, 8])    
+
+        decoder_output = Dense(self._prediction_size,
+                        activation='linear',
+                        name='decoder_dense_flatten')(decoder_output)                
 
         net_model = Model(inputs=[_encoder_input, _decoder_input],
                           outputs=decoder_output)
