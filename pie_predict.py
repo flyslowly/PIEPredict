@@ -660,7 +660,7 @@ class PIEPredict(object):
         _encoder_input = Input(shape=(self._observe_length, self._encoder_feature_size),
                                name='encoder_input')
 
-        x = PositionalEmbedding(self._predict_length, max_len, key_dim)(_encoder_input)
+        x = PositionalEmbedding(self._observe_length, max_len, key_dim)(_encoder_input)
 
         # Temporal attention module
         # _attention_net = self.attention_temporal(_encoder_input, self._observe_length) //Attention
@@ -678,6 +678,8 @@ class PIEPredict(object):
         # _hidden_input = RepeatVector(self._predict_length)(_encoder_states[0])
         _decoder_input = Input(shape=(self._predict_length, self._encoder_feature_size),
                                name='pred_decoder_input')
+
+        x = PositionalEmbedding(self._observe_length, max_len, key_dim)(encoder_outputs)
 
         # x = PositionalEmbedding(self._predict_length, max_len, key_dim)(_decoder_input)
 
@@ -699,7 +701,7 @@ class PIEPredict(object):
         # decoder_output = decoder_model(decoder_concat_inputs,
         #                                initial_state=_encoder_states)
                                        
-        decoder_output = tf_decoder(encoder_outputs)                               
+        decoder_output = tf_decoder(x)                               
         # decoder_output = Dense(self._prediction_size,
         #                        activation='linear',
         #                        name='decoder_dense')(decoder_output)
@@ -805,15 +807,15 @@ class TransformerDecoder(layers.Layer):
         )
         out_1 = self.layernorm_1(encoder_outputs + attention_output_1)
 
-        # attention_output_2 = self.attention_2(
-        #     query=out_1,
-        #     value=encoder_outputs,
-        #     key=encoder_outputs
-        # )
-        # out_2 = self.layernorm_2(out_1 + attention_output_2)
+        attention_output_2 = self.attention_2(
+            query=out_1,
+            value=encoder_outputs,
+            key=encoder_outputs
+        )
+        out_2 = self.layernorm_2(out_1 + attention_output_2)
 
-        proj_output = self.dense_proj(out_1)
-        return self.layernorm_3(out_1 + proj_output)
+        proj_output = self.dense_proj(out_2)
+        return self.layernorm_3(out_2 + proj_output)
 
 class PositionalEmbedding(layers.Layer):
     def __init__(self, sequence_length, max_len, key_dim, **kwargs):
